@@ -1,3 +1,5 @@
+//  Build: g++ NeuralNetwork.cpp -o NeuralNetwork -larmadillo
+
 #include <iostream>
 #include <cmath>
 #include <armadillo>
@@ -20,14 +22,14 @@ class NeuralNetwork{
             return 1/(1 + std::pow(arma::datum::e, -value));
         }
 
-        void forward(arma::vec inputs){
-            arma::vec h_inputs = arma::dot(h_weights, inputs);
-            arma::vec h_outputs = h_inputs.transform([](float x){sigmoid(x);});
-        }
+        arma::vec forward(arma::vec inputs){
+            arma::vec h_inputs = h_weights % inputs;
+            arma::vec h_outputs = h_inputs.transform([&](float x){return sigmoid(x);});
+            
+            arma::vec final_inputs = o_weights % h_outputs;
+            arma::vec final_output = final_inputs.transform([&](float x){return sigmoid(x);});
 
-        void get_weights(){
-            h_weights.print();
-            o_weights.print();
+            return final_output;
         }
         
     
@@ -44,7 +46,12 @@ class NeuralNetwork{
 };
 
 int main(){
-    NeuralNetwork n(3, 3, 3, 0.5);
+    NeuralNetwork n(3, 3, 3, 0.3);
 
     // std::cout << n.sigmoid(0) << std::endl;
+
+    arma::vec input = {1.0, 0.5, -1.5};
+    arma::vec output = n.forward(input);
+    
+    output.print();
 }
